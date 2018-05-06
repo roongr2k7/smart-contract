@@ -1,0 +1,28 @@
+FROM golang:1.10 as builder
+LABEL maintainer="Narate Ketram <rate@dome.cloud>"
+LABEL maintainer="Pitsanu Swangpheaw <pitsanu_s@hotmail.com>"
+
+ENV TERM=xterm-256color
+ENV CGO_ENABLED=0
+
+RUN go get github.com/golang/dep/cmd/dep
+RUN go get -d github.com/ndidplatform/smart-contract/abci
+
+WORKDIR $GOPATH/src/github.com/ndidplatform/smart-contract/abci
+
+# TODO: please merge to master and remove this command (checkout add_validator) 
+RUN git checkout add_validator
+
+RUN dep ensure
+#RUN go install github.com/ndidplatform/smart-contract/abci
+RUN go install
+
+
+FROM alpine:3.7
+COPY --from=builder /go/bin/abci /abci-server
+
+ENV ADDR=46000
+ENV CALLBACK_URI=
+#ENV CALLBACK_URI=http://api:3000/callback
+
+CMD /abci-server $ADDR

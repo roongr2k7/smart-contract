@@ -1,0 +1,46 @@
+FROM golang:1.10 as builder
+LABEL maintainer="Pitsanu Swangpheaw <pitsanu_s@hotmail.com>"
+
+ENV TERM=xterm-256color
+ENV CGO_ENABLED=0
+
+RUN go get github.com/Masterminds/glide
+RUN mkdir -p $GOPATH/src/github.com/tendermint
+WORKDIR $GOPATH/src/github.com/tendermint
+RUN git clone -b v0.16.0 https://github.com/tendermint/tendermint.git
+WORKDIR $GOPATH/src/github.com/tendermint/tendermint
+RUN glide install
+RUN go install ./cmd/tendermint
+
+
+FROM alpine:3.6
+
+ENV DATA_ROOT /tendermint
+ENV TMHOME $DATA_ROOT
+
+# Set user right away for determinism
+RUN addgroup tmuser && \
+    adduser -S -G tmuser tmuser
+
+# Create directory for persistence and give our user ownership
+RUN mkdir -p $DATA_ROOT && \
+    chown -R tmuser:tmuser $DATA_ROOT
+
+# jq and curl used for extracting `pub_key` from private validator while
+# deploying tendermint with Kubernetes. It is nice to have bash so the users
+# could execute bash commands.
+RUN apk add --no-cache bash curl jq
+
+COPY --from=builder /go/bin/tendermint /bin
+
+# Expose the data directory as a volume since there's mutable state in there
+VOLUME $DATA_ROOT
+
+# p2p port
+EXPOSE 46656
+# rpc port
+EXPOSE 46657
+
+ENTRYPOINT ["tendermint"]
+
+CMD ["node", "--moniker=`hostname`"]
