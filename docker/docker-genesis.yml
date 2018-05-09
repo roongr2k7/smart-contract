@@ -10,7 +10,7 @@ services:
       - CALLBACK_URI=
     expose:
       - "46000"
-    network:
+    networks:
       - tendermint-net
 
   genesis-tendermint:
@@ -20,7 +20,7 @@ services:
     command: /tmp/scripts/start-tendermint.sh --proxy_app=tcp://genesis-abci:46000
     depends_on:
       - genesis-abci
-    network:
+    networks:
       - tendermint-net
     volumes:
       - ./tendermint:/tendermint
