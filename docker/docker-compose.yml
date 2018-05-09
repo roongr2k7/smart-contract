@@ -29,7 +29,7 @@ services:
 
   # AS
   as-abci:
-    hostname: as-abci
+    #hostname: as-abci
     image: roongr2k7/abci:0.1.0
     command: /abci-server 0.0.0.0:46000
     environment:
@@ -40,7 +40,7 @@ services:
       - tendermint-net
 
   as-tendermint:
-    hostname: as-tendermint
+    #hostname: as-tendermint
     image: roongr2k7/tendermint:0.16.0
     entrypoint: /tmp/scripts/init-tendermint.sh
     command: /tmp/scripts/start-tendermint.sh --proxy_app=tcp://as-abci:46000
@@ -56,7 +56,7 @@ services:
 
   # IdP
   idp-abci:
-    hostname: idp-abci
+    #hostname: idp-abci
     image: roongr2k7/abci:0.1.0
     command: /abci-server 0.0.0.0:46000
     environment:
@@ -67,7 +67,7 @@ services:
       - tendermint-net
 
   idp-tendermint:
-    hostname: idp-tendermint
+    #hostname: idp-tendermint
     image: roongr2k7/tendermint:0.16.0
     entrypoint: /tmp/scripts/init-tendermint.sh
     command: /tmp/scripts/start-tendermint.sh --proxy_app=tcp://idp-abci:46000
@@ -83,7 +83,7 @@ services:
 
   #RP
   rp-abci:
-    hostname: rp-abci
+    #hostname: rp-abci
     image: roongr2k7/abci:0.1.0
     command: /abci-server 0.0.0.0:46000
     environment:
@@ -94,7 +94,7 @@ services:
       - tendermint-net
 
   rp-tendermint:
-    hostname: rp-tendermint
+    #hostname: rp-tendermint
     image: roongr2k7/tendermint:0.16.0
     entrypoint: /tmp/scripts/init-tendermint.sh
     command: /tmp/scripts/start-tendermint.sh --proxy_app=tcp://rp-abci:46000
