@@ -1,0 +1,30 @@
+---
+version: "3"
+services:
+  # GENESIG
+  genesis-abci:
+    hostname: genesis-abci
+    image: roongr2k7/abci:0.1.0
+    command: /abci-server 0.0.0.0:46000
+    environment:
+      - CALLBACK_URI=
+    expose:
+      - "46000"
+    network:
+      - tendermint-net
+
+  genesis-tendermint:
+    hostname: genesis-tendermint
+    image: roongr2k7/tendermint:0.16.0
+    entrypoint: /tmp/scripts/init-tendermint.sh
+    command: /tmp/scripts/start-tendermint.sh --proxy_app=tcp://genesis-abci:46000
+    depends_on:
+      - genesis-abci
+    network:
+      - tendermint-net
+    volumes:
+      - ./tendermint:/tendermint
+      - ./scripts:/tmp/scripts
+
+networks:
+  tendermint-net:
